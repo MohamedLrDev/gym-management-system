@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Member;
-
+use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -26,7 +26,7 @@ class MembersController extends Controller
      */
     public function create()
     {
-        
+        return Inertia::render('Members/CreateMember');
     }
 
     /**
@@ -43,12 +43,9 @@ class MembersController extends Controller
             'membership_end_date' => 'required|date',
         ]);
         // Create member
-        $member = Member::create($validated);
+        Member::create($validated);
 
-        return response()->json([
-            'message' => 'Member created successfully',
-            'member' => $member
-        ], 201);
+        return redirect()->route('members.index')->with('success', 'Member created successfully!');
     }
 
     /**
@@ -62,41 +59,45 @@ class MembersController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Member $members)
+    public function edit(Member $member)
     {
-        //
+        // $members = Member::findOrFail($members->id);
+        return Inertia::render('Members/EditMember', [
+            'member' => $member
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Member $members)
+    public function update(Request $request, Member $member)
     {
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:members,email',
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('members', 'email')->ignore($member->id),
+            ],
             'phone' => 'nullable|string|max:20',
             'membership_status' => 'required|string',
             'membership_end_date' => 'required|date',
         ]);
         // Update member
-        $members->update($validated);
+        $member->update($validated);
 
-        return response()->json([
-            'message' => 'Member updated successfully',
-            'member' => $members
-        ], 200);
+        return redirect()->route('members.index')->with('success', 'Member updated successfully!');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Member $members)
+    public function destroy(Member $member)
     {
-        $members->delete();
+        $member->delete();
 
-        return response()->json([
-            'message' => 'Member deleted successfully'
-        ]);
+        return redirect()->route('members.index')
+            ->with('success', 'Member deleted successfully!');
     }
 }
