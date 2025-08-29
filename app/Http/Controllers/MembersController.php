@@ -14,7 +14,8 @@ class MembersController extends Controller
      */
     public function index()
     {
-        $members = Member::all();
+        // $members = Member::all();
+        $members = Member::with('payments')->get();
         return Inertia::render('Members/Index', [
             'members' => $members
         ]);
@@ -51,9 +52,13 @@ class MembersController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Member $members)
+    public function show(Member $member)
     {
-        //
+        // load payments relationship
+        $member->load('payments');
+        return Inertia::render('Members/ShowMember', [
+            'member' => $member
+        ]);
     }
 
     /**

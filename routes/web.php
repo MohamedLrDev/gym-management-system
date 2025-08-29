@@ -5,7 +5,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\MembersController;
-use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\PaymentsController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -27,7 +27,7 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::resource('members', MembersController::class);
-Route::resource('payments', PaymentController::class);
+Route::resource('payments', PaymentsController::class);
 
 
 require __DIR__.'/auth.php';

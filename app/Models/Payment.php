@@ -26,15 +26,15 @@ class Payment extends Model
     }
 
     // Automatically set end_date based on plan_type and start_date
-     protected static function booted()
-    {
-        static::creating(function ($payment) {
-            if ($payment->plan_type === 'monthly') {
-                $payment->end_date = Carbon::parse($payment->start_date)->addDays(30);
-            } elseif ($payment->plan_type === 'yearly') {
-                $payment->end_date = Carbon::parse($payment->start_date)->addYear();
-            }
-        });
-    }
+    //  protected static function booted()
+    // {
+    //     static::creating(function ($payment) {
+    //         if ($payment->plan_type === 'monthly') {
+    //             $payment->end_date = Carbon::parse($payment->start_date)->addDays(30);
+    //         } elseif ($payment->plan_type === 'yearly') {
+    //             $payment->end_date = Carbon::parse($payment->start_date)->addYear();
+    //         }
+    //     });
+    // }
 }
 
