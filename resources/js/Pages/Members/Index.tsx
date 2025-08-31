@@ -25,7 +25,7 @@ export default function Index({ members }: Props) {
     };
 
     const formatDate = (dateString: string | null) => {
-        if (!dateString) return "—";
+        if (!dateString) return "â€”";
         return new Date(dateString).toLocaleDateString('en-US', {
             month: '2-digit',
             day: '2-digit',
@@ -51,6 +51,47 @@ export default function Index({ members }: Props) {
         const diffTime = expiryDate.getTime() - today.getTime();
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         return diffDays <= 30 && diffDays >= 0;
+    };
+
+    const getMembershipProgress = (endDate: string | null) => {
+        if (!endDate) return { percentage: 0, daysLeft: 0, status: 'expired' };
+        
+        const today = new Date();
+        const expiryDate = new Date(endDate);
+        
+        // Assume a standard membership is 365 days (can be adjusted based on your business logic)
+        const membershipDuration = 365;
+        const startDate = new Date(expiryDate);
+        startDate.setDate(startDate.getDate() - membershipDuration);
+        
+        const totalTime = expiryDate.getTime() - startDate.getTime();
+        const remainingTime = expiryDate.getTime() - today.getTime();
+        const daysLeft = Math.ceil(remainingTime / (1000 * 60 * 60 * 24));
+        
+        if (daysLeft < 0) {
+            return { percentage: 0, daysLeft: 0, status: 'expired' };
+        }
+        
+        const percentage = Math.max(0, Math.min(100, (remainingTime / totalTime) * 100));
+        
+        let status = 'active';
+        if (daysLeft <= 7) status = 'critical';
+        else if (daysLeft <= 30) status = 'warning';
+        
+        return { percentage: Math.round(percentage), daysLeft, status };
+    };
+
+    const getProgressBarColor = (status: string) => {
+        switch (status) {
+            case 'critical':
+                return 'bg-red-500';
+            case 'warning':
+                return 'bg-yellow-500';
+            case 'expired':
+                return 'bg-gray-400';
+            default:
+                return 'bg-green-500';
+        }
     };
 
     const selectedMemberData = selectedMember ? members.find(m => m.id === selectedMember) : null;
@@ -115,6 +156,30 @@ export default function Index({ members }: Props) {
                                                     <p className={`text-sm ${getStatusColor(member.membership_status)} capitalize`}>
                                                         {member.membership_status}
                                                     </p>
+                                                    {/* Progress Bar */}
+                                                    <div className="mt-2">
+                                                        {(() => {
+                                                            const progress = getMembershipProgress(member.membership_end_date);
+                                                            return (
+                                                                <div>
+                                                                    <div className="flex justify-between items-center mb-1">
+                                                                        <span className="text-xs text-gray-500">
+                                                                            {progress.daysLeft} days left
+                                                                        </span>
+                                                                        <span className="text-xs text-gray-500">
+                                                                            {progress.percentage}%
+                                                                        </span>
+                                                                    </div>
+                                                                    <div className="w-full bg-gray-200 rounded-full h-2">
+                                                                        <div 
+                                                                            className={`h-2 rounded-full transition-all duration-300 ${getProgressBarColor(progress.status)}`}
+                                                                            style={{ width: `${progress.percentage}%` }}
+                                                                        />
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        })()}
+                                                    </div>
                                                 </div>
                                                 <div className="flex-shrink-0 text-right">
                                                     <p className="text-sm text-gray-500">
@@ -142,7 +207,7 @@ export default function Index({ members }: Props) {
                                         <p className="mt-1 text-sm text-gray-500 mb-4">
                                             Get started by adding your first gym member.
                                         </p>
-                                        {/* <Link
+                                        <Link
                                             href="/members/create"
                                             className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition-colors"
                                         >
@@ -150,7 +215,7 @@ export default function Index({ members }: Props) {
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                             </svg>
                                             Add First Member
-                                        </Link> */}
+                                        </Link>
                                     </div>
                                 )}
                             </div>
@@ -225,6 +290,44 @@ export default function Index({ members }: Props) {
                                                             Expires soon - No recent payments
                                                         </p>
                                                     )}
+                                                </div>
+                                                {/* Detailed Progress Bar */}
+                                                <div>
+                                                    <label className="text-sm font-medium text-gray-700">Membership Progress</label>
+                                                    {(() => {
+                                                        const progress = getMembershipProgress(selectedMemberData.membership_end_date);
+                                                        return (
+                                                            <div className="mt-2">
+                                                                <div className="flex justify-between items-center mb-2">
+                                                                    <span className="text-sm text-gray-600">
+                                                                        {progress.daysLeft} days remaining
+                                                                    </span>
+                                                                    <span className="text-sm font-medium text-gray-900">
+                                                                        {progress.percentage}%
+                                                                    </span>
+                                                                </div>
+                                                                <div className="w-full bg-gray-200 rounded-full h-3">
+                                                                    <div 
+                                                                        className={`h-3 rounded-full transition-all duration-500 ${getProgressBarColor(progress.status)}`}
+                                                                        style={{ width: `${progress.percentage}%` }}
+                                                                    />
+                                                                </div>
+                                                                <div className="flex justify-between text-xs text-gray-500 mt-1">
+                                                                    <span>Start</span>
+                                                                    <span className={`font-medium ${
+                                                                        progress.status === 'critical' ? 'text-red-600' :
+                                                                        progress.status === 'warning' ? 'text-yellow-600' :
+                                                                        progress.status === 'expired' ? 'text-gray-600' : 'text-green-600'
+                                                                    }`}>
+                                                                        {progress.status === 'expired' ? 'Expired' : 
+                                                                         progress.status === 'critical' ? 'Critical' :
+                                                                         progress.status === 'warning' ? 'Expiring Soon' : 'Active'}
+                                                                    </span>
+                                                                    <span>End</span>
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })()}
                                                 </div>
                                             </div>
                                         </div>
