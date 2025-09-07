@@ -11,10 +11,9 @@ class Member extends Model
     protected $fillable = [
         'name',
         'email',
-        'phone',
-        'membership_status',
-        'membership_end_date',
+        'phone'
     ];
+    
     public function payments()
     {
         return $this->hasMany(Payment::class, 'member_id');

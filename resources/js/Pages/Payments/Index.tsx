@@ -1,19 +1,18 @@
 import React from "react";
-import { Link, usePage, router } from "@inertiajs/react";
+import { Head, Link, useForm, router } from "@inertiajs/react";
 
 interface Member {
   id: number;
   name: string;
-  email: string;
 }
 
 interface Payment {
   id: number;
-  member: Member;
   plan_type: "monthly" | "yearly";
   amount: number;
   start_date: string;
   end_date: string;
+  member: Member;
 }
 
 interface Props {
@@ -23,58 +22,68 @@ interface Props {
 export default function Index({ payments }: Props) {
   const handleDelete = (id: number) => {
     if (confirm("Are you sure you want to delete this payment?")) {
-      router.delete(`/payments/${id}`);
+      router.delete(route("payments.destroy", id));
     }
   };
 
   return (
-    <div className="p-6">
-      <h1 className="text-xl font-bold mb-4">Payments</h1>
+    <>
+      <Head title="Payments" />
+      <div className="p-6">
+        <div className="flex justify-between items-center mb-4">
+          <h1 className="text-2xl font-bold">Payments</h1>
+          <Link
+            href={route("payments.create")}
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            + Add Payment
+          </Link>
+        </div>
 
-      <Link
-        href="/payments/create"
-        className="px-4 py-2 bg-blue-600 text-white rounded"
-      >
-        + New Payment
-      </Link>
-
-      <table className="w-full mt-4 border-collapse">
-        <thead>
-          <tr className="bg-gray-200 text-left">
-            <th className="p-2">Member</th>
-            <th className="p-2">Plan</th>
-            <th className="p-2">Amount</th>
-            <th className="p-2">Start Date</th>
-            <th className="p-2">End Date</th>
-            <th className="p-2">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {payments.map((payment) => (
-            <tr key={payment.id} className="border-b">
-              <td className="p-2">{payment.member?.name}</td>
-              <td className="p-2 capitalize">{payment.plan_type}</td>
-              <td className="p-2">${payment.amount}</td>
-              <td className="p-2">{payment.start_date}</td>
-              <td className="p-2">{payment.end_date}</td>
-              <td className="p-2 space-x-2">
-                <Link
-                  href={`/payments/${payment.id}/edit`}
-                  className="px-2 py-1 bg-green-500 text-white rounded"
-                >
-                  Edit
-                </Link>
-                <button
-                  onClick={() => handleDelete(payment.id)}
-                  className="px-2 py-1 bg-red-500 text-white rounded"
-                >
-                  Delete
-                </button>
-              </td>
+        <table className="w-full border-collapse border border-gray-300">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="border p-2">Member</th>
+              <th className="border p-2">Plan</th>
+              <th className="border p-2">Amount</th>
+              <th className="border p-2">Start Date</th>
+              <th className="border p-2">End Date</th>
+              <th className="border p-2">Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody>
+            {payments.map((payment) => (
+              <tr key={payment.id}>
+                <td className="border p-2">{payment.member?.name}</td>
+                <td className="border p-2 capitalize">{payment.plan_type}</td>
+                <td className="border p-2">{payment.amount} MAD</td>
+                <td className="border p-2">{payment.start_date}</td>
+                <td className="border p-2">{payment.end_date}</td>
+                <td className="border p-2 flex gap-2">
+                  <Link
+                    href={route("payments.show", payment.id)}
+                    className="text-blue-600 hover:underline"
+                  >
+                    Show
+                  </Link>
+                  <Link
+                    href={route("payments.edit", payment.id)}
+                    className="text-green-600 hover:underline"
+                  >
+                    Edit
+                  </Link>
+                  <button
+                    onClick={() => handleDelete(payment.id)}
+                    className="text-red-600 hover:underline"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
   );
 }

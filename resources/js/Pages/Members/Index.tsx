@@ -1,16 +1,27 @@
 import { Link, usePage } from "@inertiajs/react";
 import { Inertia } from "@inertiajs/inertia";
 import { useState } from "react";
+import PaymentBtn from "@/Components/PaymentBtn";
+import { SquarePen, Trash } from "lucide-react";
+
+interface Payment {
+    id: number;
+    plan_type: "monthly" | "yearly";
+    amount: string;
+    start_date: string;
+    end_date: string;
+}
+
+interface Member {
+    id: number;
+    name: string;
+    email: string;
+    phone: string | null;
+    payments: Payment[];
+}
 
 interface Props {
-    members: {
-        id: number;
-        name: string;
-        email: string;
-        phone: string;
-        membership_status: string;
-        membership_end_date: string | null;
-    }[];
+    members: Member[];
 }
 
 export default function Index({ members }: Props) {
@@ -18,83 +29,16 @@ export default function Index({ members }: Props) {
     const flash = props.flash as { success?: string };
     const [selectedMember, setSelectedMember] = useState<number | null>(null);
 
+    // Delete member confirmation
     const deleteMember = (id: number) => {
         if (confirm("Are you sure you want to delete this member?")) {
             Inertia.delete(`/members/${id}`);
         }
     };
 
-    const formatDate = (dateString: string | null) => {
-        if (!dateString) return "â€”";
-        return new Date(dateString).toLocaleDateString('en-US', {
-            month: '2-digit',
-            day: '2-digit',
-            year: 'numeric'
-        });
-    };
-
-    const getStatusColor = (status: string) => {
-        switch (status.toLowerCase()) {
-            case 'premium':
-                return 'text-blue-600';
-            case 'basic':
-                return 'text-green-600';
-            default:
-                return 'text-gray-600';
-        }
-    };
-
-    const isExpiringSoon = (endDate: string | null) => {
-        if (!endDate) return false;
-        const today = new Date();
-        const expiryDate = new Date(endDate);
-        const diffTime = expiryDate.getTime() - today.getTime();
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        return diffDays <= 30 && diffDays >= 0;
-    };
-
-    const getMembershipProgress = (endDate: string | null) => {
-        if (!endDate) return { percentage: 0, daysLeft: 0, status: 'expired' };
-        
-        const today = new Date();
-        const expiryDate = new Date(endDate);
-        
-        // Assume a standard membership is 365 days (can be adjusted based on your business logic)
-        const membershipDuration = 365;
-        const startDate = new Date(expiryDate);
-        startDate.setDate(startDate.getDate() - membershipDuration);
-        
-        const totalTime = expiryDate.getTime() - startDate.getTime();
-        const remainingTime = expiryDate.getTime() - today.getTime();
-        const daysLeft = Math.ceil(remainingTime / (1000 * 60 * 60 * 24));
-        
-        if (daysLeft < 0) {
-            return { percentage: 0, daysLeft: 0, status: 'expired' };
-        }
-        
-        const percentage = Math.max(0, Math.min(100, (remainingTime / totalTime) * 100));
-        
-        let status = 'active';
-        if (daysLeft <= 7) status = 'critical';
-        else if (daysLeft <= 30) status = 'warning';
-        
-        return { percentage: Math.round(percentage), daysLeft, status };
-    };
-
-    const getProgressBarColor = (status: string) => {
-        switch (status) {
-            case 'critical':
-                return 'bg-red-500';
-            case 'warning':
-                return 'bg-yellow-500';
-            case 'expired':
-                return 'bg-gray-400';
-            default:
-                return 'bg-green-500';
-        }
-    };
-
-    const selectedMemberData = selectedMember ? members.find(m => m.id === selectedMember) : null;
+    const selectedMemberData = selectedMember
+        ? members.find((m) => m.id === selectedMember)
+        : null;
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -102,7 +46,9 @@ export default function Index({ members }: Props) {
             <div className="bg-white shadow-sm border-b">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center py-4">
-                        <h1 className="text-2xl font-bold text-gray-900">Gym Management</h1>
+                        <h1 className="text-2xl font-bold text-gray-900">
+                            Gym Management
+                        </h1>
                         <Link
                             href="/members/create"
                             className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
@@ -129,7 +75,9 @@ export default function Index({ members }: Props) {
                     <div className="lg:col-span-1">
                         <div className="bg-white rounded-lg shadow">
                             <div className="px-6 py-4 border-b border-gray-200">
-                                <h2 className="text-lg font-semibold text-gray-900">Members</h2>
+                                <h2 className="text-lg font-semibold text-gray-900">
+                                    Members
+                                </h2>
                             </div>
                             <div className="divide-y divide-gray-200">
                                 {members.length > 0 ? (
@@ -137,15 +85,27 @@ export default function Index({ members }: Props) {
                                         <div
                                             key={member.id}
                                             className={`p-4 hover:bg-gray-50 cursor-pointer transition-colors ${
-                                                selectedMember === member.id ? 'bg-blue-50 border-l-4 border-blue-500' : ''
+                                                selectedMember === member.id
+                                                    ? "bg-blue-50 border-l-4 border-blue-500"
+                                                    : ""
                                             }`}
-                                            onClick={() => setSelectedMember(member.id)}
+                                            onClick={() =>
+                                                setSelectedMember(member.id)
+                                            }
                                         >
                                             <div className="flex items-center space-x-3">
                                                 <div className="flex-shrink-0">
                                                     <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                                                        <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                                                            <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                                                        <svg
+                                                            className="w-5 h-5 text-blue-600"
+                                                            fill="currentColor"
+                                                            viewBox="0 0 20 20"
+                                                        >
+                                                            <path
+                                                                fillRule="evenodd"
+                                                                d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                                                                clipRule="evenodd"
+                                                            />
                                                         </svg>
                                                     </div>
                                                 </div>
@@ -153,67 +113,26 @@ export default function Index({ members }: Props) {
                                                     <p className="text-sm font-medium text-gray-900 truncate">
                                                         {member.name}
                                                     </p>
-                                                    <p className={`text-sm ${getStatusColor(member.membership_status)} capitalize`}>
-                                                        {member.membership_status}
+                                                    <p className="text-sm text-gray-500 truncate">
+                                                        {member.email}
                                                     </p>
-                                                    {/* Progress Bar */}
-                                                    <div className="mt-2">
-                                                        {(() => {
-                                                            const progress = getMembershipProgress(member.membership_end_date);
-                                                            return (
-                                                                <div>
-                                                                    <div className="flex justify-between items-center mb-1">
-                                                                        <span className="text-xs text-gray-500">
-                                                                            {progress.daysLeft} days left
-                                                                        </span>
-                                                                        <span className="text-xs text-gray-500">
-                                                                            {progress.percentage}%
-                                                                        </span>
-                                                                    </div>
-                                                                    <div className="w-full bg-gray-200 rounded-full h-2">
-                                                                        <div 
-                                                                            className={`h-2 rounded-full transition-all duration-300 ${getProgressBarColor(progress.status)}`}
-                                                                            style={{ width: `${progress.percentage}%` }}
-                                                                        />
-                                                                    </div>
-                                                                </div>
-                                                            );
-                                                        })()}
-                                                    </div>
-                                                </div>
-                                                <div className="flex-shrink-0 text-right">
-                                                    <p className="text-sm text-gray-500">
-                                                        {formatDate(member.membership_end_date)}
-                                                    </p>
-                                                    {isExpiringSoon(member.membership_end_date) && (
-                                                        <p className="text-xs text-red-600 font-medium">No payments</p>
-                                                    )}
-                                                    <Link
-                                                        href={`/members/${member.id}`}
-                                                        className="text-xs text-blue-600 hover:underline"
-                                                    >
-                                                        Record Payment
-                                                    </Link>
                                                 </div>
                                             </div>
                                         </div>
                                     ))
                                 ) : (
                                     <div className="p-8 text-center">
-                                        <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                                        </svg>
-                                        <h3 className="mt-2 text-sm font-medium text-gray-900">No members yet</h3>
+                                        <h3 className="mt-2 text-sm font-medium text-gray-900">
+                                            No members yet
+                                        </h3>
                                         <p className="mt-1 text-sm text-gray-500 mb-4">
-                                            Get started by adding your first gym member.
+                                            Get started by adding your first gym
+                                            member.
                                         </p>
                                         <Link
                                             href="/members/create"
                                             className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition-colors"
                                         >
-                                            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                            </svg>
                                             Add First Member
                                         </Link>
                                     </div>
@@ -222,7 +141,7 @@ export default function Index({ members }: Props) {
                         </div>
                     </div>
 
-                    {/* Member Details */}
+                    {/* Member Details & Payments */}
                     <div className="lg:col-span-2">
                         <div className="bg-white rounded-lg shadow h-full">
                             {selectedMemberData ? (
@@ -232,8 +151,8 @@ export default function Index({ members }: Props) {
                                             <h3 className="text-xl font-semibold text-gray-900">
                                                 {selectedMemberData.name}
                                             </h3>
-                                            <p className={`text-sm ${getStatusColor(selectedMemberData.membership_status)} capitalize mt-1`}>
-                                                {selectedMemberData.membership_status} Member
+                                            <p className="text-sm text-gray-500 mt-1">
+                                                {selectedMemberData.email}
                                             </p>
                                         </div>
                                         <div className="flex space-x-2">
@@ -244,7 +163,11 @@ export default function Index({ members }: Props) {
                                                 Edit
                                             </Link>
                                             <button
-                                                onClick={() => deleteMember(selectedMemberData.id)}
+                                                onClick={() =>
+                                                    deleteMember(
+                                                        selectedMemberData.id
+                                                    )
+                                                }
                                                 className="bg-red-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-red-700 transition-colors"
                                             >
                                                 Delete
@@ -259,103 +182,111 @@ export default function Index({ members }: Props) {
                                             </h4>
                                             <div className="space-y-3">
                                                 <div>
-                                                    <label className="text-sm font-medium text-gray-700">Email</label>
-                                                    <p className="text-sm text-gray-900">{selectedMemberData.email}</p>
-                                                </div>
-                                                <div>
-                                                    <label className="text-sm font-medium text-gray-700">Phone</label>
-                                                    <p className="text-sm text-gray-900">{selectedMemberData.phone}</p>
+                                                    <label className="text-sm font-medium text-gray-700">
+                                                        Phone
+                                                    </label>
+                                                    <p className="text-sm text-gray-900">
+                                                        {
+                                                            selectedMemberData.phone
+                                                        }
+                                                    </p>
                                                 </div>
                                             </div>
                                         </div>
 
+                                        {/* Payments */}
                                         <div>
                                             <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-3">
-                                                Membership Details
+                                                Payments
                                             </h4>
-                                            <div className="space-y-3">
-                                                <div>
-                                                    <label className="text-sm font-medium text-gray-700">Status</label>
-                                                    <p className={`text-sm ${getStatusColor(selectedMemberData.membership_status)} capitalize font-medium`}>
-                                                        {selectedMemberData.membership_status}
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <label className="text-sm font-medium text-gray-700">End Date</label>
-                                                    <p className="text-sm text-gray-900">
-                                                        {formatDate(selectedMemberData.membership_end_date)}
-                                                    </p>
-                                                    {isExpiringSoon(selectedMemberData.membership_end_date) && (
-                                                        <p className="text-xs text-red-600 font-medium mt-1">
-                                                            Expires soon - No recent payments
-                                                        </p>
-                                                    )}
-                                                </div>
-                                                {/* Detailed Progress Bar */}
-                                                <div>
-                                                    <label className="text-sm font-medium text-gray-700">Membership Progress</label>
-                                                    {(() => {
-                                                        const progress = getMembershipProgress(selectedMemberData.membership_end_date);
-                                                        return (
-                                                            <div className="mt-2">
-                                                                <div className="flex justify-between items-center mb-2">
-                                                                    <span className="text-sm text-gray-600">
-                                                                        {progress.daysLeft} days remaining
-                                                                    </span>
-                                                                    <span className="text-sm font-medium text-gray-900">
-                                                                        {progress.percentage}%
-                                                                    </span>
+                                            {selectedMemberData.payments
+                                                .length > 0 ? (
+                                                <div className="space-y-3">
+                                                    {selectedMemberData.payments.map(
+                                                        (payment) => (
+                                                            <div
+                                                                key={payment.id}
+                                                                className="border rounded-lg p-3 bg-gray-50 flex justify-between items-center"
+                                                            >
+                                                                <div>
+                                                                    <p className="text-sm text-gray-700">
+                                                                        <span className="font-medium">
+                                                                            Plan:
+                                                                        </span>{" "}
+                                                                        {
+                                                                            payment.plan_type
+                                                                        }
+                                                                    </p>
+                                                                    <p className="text-sm text-gray-700">
+                                                                        <span className="font-medium">
+                                                                            Amount:
+                                                                        </span>{" "}
+                                                                        {
+                                                                            payment.amount
+                                                                        }{" "}
+                                                                        MAD
+                                                                    </p>
+                                                                    <p className="text-sm text-gray-700">
+                                                                        <span className="font-medium">
+                                                                            Period:
+                                                                        </span>{" "}
+                                                                        {
+                                                                            payment.start_date
+                                                                        }{" "}
+                                                                        →{" "}
+                                                                        {
+                                                                            payment.end_date
+                                                                        }
+                                                                    </p>
                                                                 </div>
-                                                                <div className="w-full bg-gray-200 rounded-full h-3">
-                                                                    <div 
-                                                                        className={`h-3 rounded-full transition-all duration-500 ${getProgressBarColor(progress.status)}`}
-                                                                        style={{ width: `${progress.percentage}%` }}
-                                                                    />
-                                                                </div>
-                                                                <div className="flex justify-between text-xs text-gray-500 mt-1">
-                                                                    <span>Start</span>
-                                                                    <span className={`font-medium ${
-                                                                        progress.status === 'critical' ? 'text-red-600' :
-                                                                        progress.status === 'warning' ? 'text-yellow-600' :
-                                                                        progress.status === 'expired' ? 'text-gray-600' : 'text-green-600'
-                                                                    }`}>
-                                                                        {progress.status === 'expired' ? 'Expired' : 
-                                                                         progress.status === 'critical' ? 'Critical' :
-                                                                         progress.status === 'warning' ? 'Expiring Soon' : 'Active'}
-                                                                    </span>
-                                                                    <span>End</span>
+                                                                <div className="flex space-x-2">
+                                                                    <Link
+                                                                        href={`/payments/${payment.id}/edit`}
+                                                                    >
+                                                                        <SquarePen className="w-5 h-5 text-green-600" />
+                                                                    </Link>
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            if (
+                                                                                confirm(
+                                                                                    "Are you sure you want to delete this payment?"
+                                                                                )
+                                                                            ) {
+                                                                                Inertia.delete(
+                                                                                    `/payments/${payment.id}`
+                                                                                );
+                                                                            }
+                                                                        }}
+                                                                    >
+                                                                        <Trash className="w-5 h-5 text-red-600" />
+                                                                    </button>
                                                                 </div>
                                                             </div>
-                                                        );
-                                                    })()}
+                                                        )
+                                                    )}
                                                 </div>
+                                            ) : (
+                                                <div className="bg-gray-100 p-4 rounded text-sm text-gray-600">
+                                                    No related payments yet...
+                                                </div>
+                                            )}
+
+                                            {/* Add Payment */}
+                                            <div className="mt-4">
+                                                <PaymentBtn
+                                                    memberId={
+                                                        selectedMemberData.id
+                                                    }
+                                                />
                                             </div>
                                         </div>
-                                    </div>
-
-                                    <div className="mt-6 pt-6 border-t border-gray-200">
-                                        <Link
-                                            href={`/members/${selectedMemberData.id}`}
-                                            className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                                        >
-                                            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                            </svg>
-                                            Record Payment
-                                        </Link>
                                     </div>
                                 </div>
                             ) : (
                                 <div className="flex items-center justify-center h-full">
-                                    <div className="text-center">
-                                        <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                        </svg>
-                                        <h3 className="mt-2 text-sm font-medium text-gray-900">Select a member</h3>
-                                        <p className="mt-1 text-sm text-gray-500">
-                                            Choose a member from the list to view their details
-                                        </p>
-                                    </div>
+                                    <p className="text-gray-500">
+                                        Select a member to view details
+                                    </p>
                                 </div>
                             )}
                         </div>

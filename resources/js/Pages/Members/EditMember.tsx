@@ -5,14 +5,12 @@ export default function EditMember({ member }: { member: any }) {
         name: string;
         email: string;
         phone: string;
-        membership_status: string;
-        membership_end_date: string;
+        
     }>({
         name: member.name || "",
         email: member.email || "",
         phone: member.phone || "",
-        membership_status: member.membership_status || "active",
-        membership_end_date: member.membership_end_date || "",
+        
     });
 
     const submit = (e: React.FormEvent) => {
@@ -61,32 +59,9 @@ export default function EditMember({ member }: { member: any }) {
                     />
                 </div>
 
-                <div>
-                    <label className="block mb-1">Membership Status</label>
-                    <select
-                        value={data.membership_status}
-                        onChange={(e) =>
-                            setData("membership_status", e.target.value)
-                        }
-                        className="w-full border rounded px-3 py-2"
-                    >
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                    </select>
-                </div>
+                
 
-                <div>
-                    <label className="block mb-1">End Date</label>
-                    <input
-                        type="date"
-                        value={data.membership_end_date}
-                        onChange={(e) =>
-                            setData("membership_end_date", e.target.value)
-                        }
-                        className="w-full border rounded px-3 py-2"
-                    />
-                </div>
-
+                
                 <button
                     type="submit"
                     disabled={processing}

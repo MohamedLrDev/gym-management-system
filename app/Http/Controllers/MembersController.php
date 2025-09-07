@@ -14,12 +14,12 @@ class MembersController extends Controller
      */
     public function index()
     {
-        // $members = Member::all();
+        // No need to eager load payments yet unless you plan to show them
         $members = Member::with('payments')->get();
+
         return Inertia::render('Members/Index', [
             'members' => $members
         ]);
-        // return response()->json($members);
     }
 
     /**
@@ -37,16 +37,16 @@ class MembersController extends Controller
     {
         // Validate input
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name'  => 'required|string|max:255',
             'email' => 'required|email|unique:members,email',
             'phone' => 'nullable|string|max:20',
-            'membership_status' => 'required|string',
-            'membership_end_date' => 'required|date',
         ]);
+
         // Create member
         Member::create($validated);
 
-        return redirect()->route('members.index')->with('success', 'Member created successfully!');
+        return redirect()->route('members.index')
+            ->with('success', 'Member created successfully!');
     }
 
     /**
@@ -54,8 +54,7 @@ class MembersController extends Controller
      */
     public function show(Member $member)
     {
-        // load payments relationship
-        $member->load('payments');
+        // later you can load payments if needed
         return Inertia::render('Members/ShowMember', [
             'member' => $member
         ]);
@@ -66,7 +65,6 @@ class MembersController extends Controller
      */
     public function edit(Member $member)
     {
-        // $members = Member::findOrFail($members->id);
         return Inertia::render('Members/EditMember', [
             'member' => $member
         ]);
@@ -77,22 +75,21 @@ class MembersController extends Controller
      */
     public function update(Request $request, Member $member)
     {
-
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name'  => 'required|string|max:255',
             'email' => [
                 'required',
                 'email',
                 Rule::unique('members', 'email')->ignore($member->id),
             ],
             'phone' => 'nullable|string|max:20',
-            'membership_status' => 'required|string',
-            'membership_end_date' => 'required|date',
         ]);
+
         // Update member
         $member->update($validated);
 
-        return redirect()->route('members.index')->with('success', 'Member updated successfully!');
+        return redirect()->route('members.index')
+            ->with('success', 'Member updated successfully!');
     }
 
     /**

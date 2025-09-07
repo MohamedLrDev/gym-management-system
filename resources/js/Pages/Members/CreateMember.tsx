@@ -6,19 +6,18 @@ export default function CreateMember() {
         name: "",
         email: "",
         phone: "",
-        membership_status: "active",
-        membership_end_date: "",
     });
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        post("/members"); // matches your route
+        post("/members"); // matches your store route
     };
 
     return (
         <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow">
             <h1 className="text-xl font-bold mb-4">Add Member</h1>
             <form onSubmit={submit} className="space-y-4">
+                {/* Name */}
                 <div>
                     <label className="block text-sm font-medium">Name</label>
                     <input
@@ -34,6 +33,7 @@ export default function CreateMember() {
                     )}
                 </div>
 
+                {/* Email */}
                 <div>
                     <label className="block text-sm font-medium">Email</label>
                     <input
@@ -49,6 +49,7 @@ export default function CreateMember() {
                     )}
                 </div>
 
+                {/* Phone */}
                 <div>
                     <label className="block text-sm font-medium">Phone</label>
                     <input
@@ -57,36 +58,14 @@ export default function CreateMember() {
                         onChange={(e) => setData("phone", e.target.value)}
                         className="w-full border p-2 rounded"
                     />
+                    {errors.phone && (
+                        <div className="text-red-500 text-sm">
+                            {errors.phone}
+                        </div>
+                    )}
                 </div>
 
-                <div>
-                    <label className="block text-sm font-medium">Status</label>
-                    <select
-                        value={data.membership_status}
-                        onChange={(e) =>
-                            setData("membership_status", e.target.value)
-                        }
-                        className="w-full border p-2 rounded"
-                    >
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium">
-                        End Date
-                    </label>
-                    <input
-                        type="date"
-                        value={data.membership_end_date}
-                        onChange={(e) =>
-                            setData("membership_end_date", e.target.value)
-                        }
-                        className="w-full border p-2 rounded"
-                    />
-                </div>
-
+                {/* Submit */}
                 <button
                     type="submit"
                     disabled={processing}

@@ -16,8 +16,8 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->string('phone')->nullable();
-            $table->string('membership_status');
-            $table->date('membership_end_date');
+            // $table->string('membership_status');
+            // $table->date('membership_end_date');
             $table->timestamps();
         });
     }

@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useForm, usePage, Link } from "@inertiajs/react";
+import React from "react";
+import { Head, useForm, Link } from "@inertiajs/react";
 
 interface Member {
   id: number;
@@ -15,82 +15,81 @@ export default function Create({ members }: Props) {
     member_id: "",
     plan_type: "monthly",
     amount: "",
-    start_date: "",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    post("/payments");
+    post(route("payments.store"));
   };
 
   return (
-    <div className="p-6">
-      <h1 className="text-xl font-bold mb-4">Add Payment</h1>
+    <>
+      <Head title="Add Payment" />
+      <div className="p-6 max-w-lg mx-auto">
+        <h1 className="text-2xl font-bold mb-4">Add Payment</h1>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Member Select */}
-        <div>
-          <label className="block">Member</label>
-          <select
-            value={data.member_id}
-            onChange={(e) => setData("member_id", e.target.value)}
-            className="border p-2 w-full"
-          >
-            <option value="">Select Member</option>
-            {members.map((m) => (
-              <option key={m.id} value={m.id}>
-                {m.name}
-              </option>
-            ))}
-          </select>
-          {errors.member_id && (
-            <div className="text-red-500 text-sm">{errors.member_id}</div>
-          )}
-        </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block">Member</label>
+            <select
+              value={data.member_id}
+              onChange={(e) => setData("member_id", e.target.value)}
+              className="w-full border rounded p-2"
+            >
+              <option value="">Select a member</option>
+              {members.map((member) => (
+                <option key={member.id} value={member.id}>
+                  {member.name}
+                </option>
+              ))}
+            </select>
+            {errors.member_id && (
+              <div className="text-red-600">{errors.member_id}</div>
+            )}
+          </div>
 
-        {/* Plan Type */}
-        <div>
-          <label className="block">Plan Type</label>
-          <select
-            value={data.plan_type}
-            onChange={(e) => setData("plan_type", e.target.value)}
-            className="border p-2 w-full"
-          >
-            <option value="monthly">Monthly</option>
-            <option value="yearly">Yearly</option>
-          </select>
-        </div>
+          <div>
+            <label className="block">Plan Type</label>
+            <select
+              value={data.plan_type}
+              onChange={(e) => setData("plan_type", e.target.value)}
+              className="w-full border rounded p-2"
+            >
+              <option value="monthly">Monthly</option>
+              <option value="yearly">Yearly</option>
+            </select>
+          </div>
 
-        {/* Amount */}
-        <div>
-          <label className="block">Amount</label>
-          <input
-            type="number"
-            value={data.amount}
-            onChange={(e) => setData("amount", e.target.value)}
-            className="border p-2 w-full"
-          />
-        </div>
+          <div>
+            <label className="block">Amount</label>
+            <input
+              type="number"
+              value={data.amount}
+              onChange={(e) => setData("amount", e.target.value)}
+              className="w-full border rounded p-2"
+            />
+            {errors.amount && (
+              <div className="text-red-600">{errors.amount}</div>
+            )}
+          </div>
 
-        {/* Start Date */}
-        <div>
-          <label className="block">Start Date</label>
-          <input
-            type="date"
-            value={data.start_date}
-            onChange={(e) => setData("start_date", e.target.value)}
-            className="border p-2 w-full"
-          />
-        </div>
-
-        <button
-          type="submit"
-          disabled={processing}
-          className="px-4 py-2 bg-blue-600 text-white rounded"
-        >
-          Save
-        </button>
-      </form>
-    </div>
+          <div className="flex justify-between">
+            <Link
+              href={route("payments.index")}
+              className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+            >
+              Cancel
+            </Link>
+            <button
+              type="submit"
+              disabled={processing}
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              Save
+            </button>
+          </div>
+        </form>
+      </div>
+    </>
   );
 }
