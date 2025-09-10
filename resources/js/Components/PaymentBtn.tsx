@@ -4,10 +4,13 @@ import "../../css/PaymentBtn.css";
 import { Wallet } from "lucide-react";
 
 interface Props {
-  memberId: number; // pass the selected member's ID
+  memberId: number | null; // pass the selected member's ID
+  btnContent: string; // pass the selected member's ID
+  btnIcon?: React.ReactNode; // optional icon prop
+  btnColor?: string; // optional color prop
 }
 
-export default function PaymentBtn({ memberId }: Props) {
+export default function PaymentBtn({ memberId, btnContent, btnIcon, btnColor }: Props) {
   const [open, setOpen] = useState(false);
 
   const { data, setData, post, processing, errors, reset } = useForm({
@@ -31,15 +34,15 @@ export default function PaymentBtn({ memberId }: Props) {
     <>
       <button
         className="button"
-        style={{ "--clr": "#00ad54" } as React.CSSProperties}
+        style={{ "--clr": btnColor } as React.CSSProperties}
         onClick={() => setOpen(true)}
       >
         <span className="button-decor"></span>
         <div className="button-content">
           <div className="button__icon">
-            <Wallet className="w-5 h-5 text-white" />
+            {btnIcon}
           </div>
-          <span className="button__text"> Add Payment</span>
+          <span className="button__text"> {btnContent}</span>
         </div>
       </button>
 

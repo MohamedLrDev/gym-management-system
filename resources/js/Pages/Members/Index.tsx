@@ -3,6 +3,8 @@ import { Inertia } from "@inertiajs/inertia";
 import { useState } from "react";
 import PaymentBtn from "@/Components/PaymentBtn";
 import { SquarePen, Trash } from "lucide-react";
+import { Input } from "@/Components/ui/input";
+import { Wallet, BadgePlus } from "lucide-react";
 
 interface Payment {
     id: number;
@@ -26,6 +28,7 @@ interface Props {
 
 export default function Index({ members }: Props) {
     const { props } = usePage();
+    const [search, setSearch] = useState("");
     const flash = props.flash as { success?: string };
     const [selectedMember, setSelectedMember] = useState<number | null>(null);
 
@@ -40,6 +43,10 @@ export default function Index({ members }: Props) {
         ? members.find((m) => m.id === selectedMember)
         : null;
 
+    const filteredMembers = members.filter((member) =>
+        member.name.toLowerCase().includes(search.toLowerCase())
+    );
+
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Header */}
@@ -49,11 +56,13 @@ export default function Index({ members }: Props) {
                         <h1 className="text-2xl font-bold text-gray-900">
                             Gym Management
                         </h1>
-                        <Link
-                            href="/members/create"
-                            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                        >
-                            + Add Member
+                        <Link href="/members/create">
+                            <PaymentBtn
+                                memberId={null}
+                                btnContent="Add Member"
+                                btnIcon={<BadgePlus className="text-white" />}
+                                btnColor="#2986cc"
+                            />
                         </Link>
                     </div>
                 </div>
@@ -79,9 +88,17 @@ export default function Index({ members }: Props) {
                                     Members
                                 </h2>
                             </div>
+                            <div className="px-6 py-4">
+                                <Input
+                                    type="text"
+                                    placeholder="Search by name"
+                                    onChange={(e) => setSearch(e.target.value)}
+                                    value={search}
+                                />
+                            </div>
                             <div className="divide-y divide-gray-200">
-                                {members.length > 0 ? (
-                                    members.map((member) => (
+                                {filteredMembers.length > 0 ? (
+                                    filteredMembers.map((member) => (
                                         <div
                                             key={member.id}
                                             className={`p-4 hover:bg-gray-50 cursor-pointer transition-colors ${
@@ -277,6 +294,11 @@ export default function Index({ members }: Props) {
                                                     memberId={
                                                         selectedMemberData.id
                                                     }
+                                                    btnContent="Add Payment"
+                                                    btnIcon={
+                                                        <Wallet className="w-5 h-5 text-white" />
+                                                    }
+                                                    btnColor="#00ad54"
                                                 />
                                             </div>
                                         </div>
