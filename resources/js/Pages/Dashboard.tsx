@@ -1,26 +1,29 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head } from '@inertiajs/react';
+import React from "react";
+import { Head } from "@inertiajs/react";
+import AppLayout from "@/Layouts/AppLayout";
 
 export default function Dashboard() {
     return (
-        <AuthenticatedLayout
-            header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                    Dashboard
-                </h2>
-            }
-        >
+        <AppLayout>
             <Head title="Dashboard" />
+            <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
 
-            <div className="py-12">
-                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-                        <div className="p-6 text-gray-900">
-                            You're logged in!
-                        </div>
-                    </div>
+            <div className="grid grid-cols-3 gap-6">
+                <div className="bg-white p-6 rounded shadow">
+                    <h2 className="text-lg font-semibold">Active Members</h2>
+                    <p className="text-3xl mt-2">120</p>
+                </div>
+
+                <div className="bg-white p-6 rounded shadow">
+                    <h2 className="text-lg font-semibold">Payments This Month</h2>
+                    <p className="text-3xl mt-2">15,000 MAD</p>
+                </div>
+
+                <div className="bg-white p-6 rounded shadow">
+                    <h2 className="text-lg font-semibold">Expired Memberships</h2>
+                    <p className="text-3xl mt-2">8</p>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </AppLayout>
     );
 }

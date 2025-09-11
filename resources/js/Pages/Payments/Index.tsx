@@ -1,5 +1,6 @@
 import React from "react";
 import { Head, Link, useForm, router } from "@inertiajs/react";
+import AppLayout from "@/Layouts/AppLayout";
 
 interface Member {
   id: number;
@@ -27,17 +28,12 @@ export default function Index({ payments }: Props) {
   };
 
   return (
-    <>
+    <AppLayout>
       <Head title="Payments" />
       <div className="p-6">
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-2xl font-bold">Payments</h1>
-          <Link
-            href={route("payments.create")}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-          >
-            + Add Payment
-          </Link>
+
         </div>
 
         <table className="w-full border-collapse border border-gray-300">
@@ -84,6 +80,6 @@ export default function Index({ payments }: Props) {
           </tbody>
         </table>
       </div>
-    </>
+    </AppLayout>
   );
 }
