@@ -92,8 +92,11 @@ class PaymentsController extends Controller
     {
         $payment->delete();
 
-        return back()->with('success', 'Payment deleted successfully.');
+        return redirect()
+            ->route('members.index')
+            ->with('success', 'Payment deleted successfully.');
     }
+
 
     /* ------------------------- 🔹 Private Helpers ------------------------- */
 

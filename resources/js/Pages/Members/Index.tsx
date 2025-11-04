@@ -2,9 +2,18 @@ import { Link, usePage } from "@inertiajs/react";
 import { Inertia } from "@inertiajs/inertia";
 import { useState } from "react";
 import PaymentBtn from "@/Components/PaymentBtn";
-import { SquarePen, Trash, Users, Plus, Wallet } from "lucide-react";
+import {
+    SquarePen,
+    Trash,
+    Users,
+    Plus,
+    Wallet,
+    Edit,
+    Trash2,
+} from "lucide-react";
 import { Input } from "@/Components/ui/input";
 import AppLayout from "@/Layouts/AppLayout";
+import StyledBtn from "@/Components/StyledBtn";
 
 interface Payment {
     id: number;
@@ -76,7 +85,7 @@ export default function Index({ members }: Props) {
                 </div>
 
                 {/* Main Content */}
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                <div className="max-w-7xl mx-auto py-6">
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         {/* Members List */}
                         <div className="lg:col-span-1">
@@ -86,7 +95,7 @@ export default function Index({ members }: Props) {
                                         Members
                                     </h2>
                                 </div>
-                                <div className="px-6 py-4 bg-gray-50 dark:bg-gray-900">
+                                <div className="py-3 bg-gray-50 dark:bg-gray-900">
                                     <Input
                                         type="text"
                                         placeholder="Search by name"
@@ -176,20 +185,25 @@ export default function Index({ members }: Props) {
                                             <div className="flex space-x-2">
                                                 <Link
                                                     href={`/members/${selectedMemberData.id}/edit`}
-                                                    className="bg-blue-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-blue-700 dark:hover:bg-blue-500 transition-colors"
                                                 >
-                                                    Edit
+                                                    <StyledBtn
+                                                        title="Edit"
+                                                        icon={<Edit />}
+                                                        color="#3F72AF"
+                                                    />
                                                 </Link>
-                                                <button
-                                                    onClick={() =>
-                                                        deleteMember(
-                                                            selectedMemberData.id
-                                                        )
-                                                    }
-                                                    className="bg-red-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-red-700 dark:hover:bg-red-500 transition-colors"
-                                                >
-                                                    Delete
-                                                </button>
+                                                <div>
+                                                    <StyledBtn
+                                                        title="Delete"
+                                                        icon={<Trash />}
+                                                        color="#E63946"
+                                                        onClick={() =>
+                                                            deleteMember(
+                                                                selectedMemberData.id
+                                                            )
+                                                        }
+                                                    />
+                                                </div>
                                             </div>
                                         </div>
 
@@ -259,11 +273,12 @@ export default function Index({ members }: Props) {
                                                                             }
                                                                         </p>
                                                                     </div>
-                                                                    <div className="flex space-x-2">
+                                                                    <div className="flex">
                                                                         <Link
                                                                             href={`/payments/${payment.id}/edit`}
+                                                                            className="p-1 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
                                                                         >
-                                                                            <SquarePen className="w-5 h-5 text-green-600" />
+                                                                            <Edit className="w-5 h-5" />
                                                                         </Link>
                                                                         <button
                                                                             onClick={() => {
@@ -277,8 +292,9 @@ export default function Index({ members }: Props) {
                                                                                     );
                                                                                 }
                                                                             }}
+                                                                            className="p-1 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
                                                                         >
-                                                                            <Trash className="w-5 h-5 text-red-600" />
+                                                                            <Trash2 className="h-5 w-5" />
                                                                         </button>
                                                                     </div>
                                                                 </div>
