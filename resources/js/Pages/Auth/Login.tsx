@@ -36,7 +36,7 @@ export default function Login({
         <GuestLayout>
             <Head title="Log in" />
 
-            <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900 py-12 px-4">
+            <div className="flex items-center justify-center bg-white dark:bg-gray-900 py-9 px-4">
                 <div className="w-full max-w-sm">
                     {/* Header */}
                     <div className="text-center mb-8">

@@ -21,6 +21,17 @@ class PaymentsController extends Controller
         ]);
     }
 
+    // public function create()
+    // {
+    //     // Fetch all members
+    //     $members = Member::all();
+
+    //     // Return the Inertia view for showing members
+    //     return inertia('Members/ShowMember', [
+    //         'members' => Member::all(),
+    //     ]);
+    // }
+
     /**
      * Store a newly created payment for a member.
      */

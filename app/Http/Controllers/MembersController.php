@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Member;
+use App\Models\Payment;
+use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -102,4 +104,70 @@ class MembersController extends Controller
         return redirect()->route('members.index')
             ->with('success', 'Member deleted successfully!');
     }
+
+    /**
+     * Get all memberships that will expire within the next 7 days.
+     * Used for admin notifications.
+     */
+    // public function getExpiringMemberships()
+    // {
+    //     $today = Carbon::today();
+    //     $limitDate = $today->copy()->addDays(7);
+
+    //     // Get latest payment per member that expires within 7 days
+    //     $expiring = Payment::with('member')
+    //         ->whereBetween('end_date', [$today, $limitDate])
+    //         ->orderBy('end_date', 'asc')
+    //         ->get()
+    //         ->map(function ($payment) use ($today) {
+    //             $daysLeft = $today->diffInDays(Carbon::parse($payment->end_date), false);
+
+    //             return [
+    //                 'member_id'   => $payment->member->id,
+    //                 'member_name' => $payment->member->name,
+    //                 'plan_type'   => ucfirst($payment->plan_type),
+    //                 'end_date'    => $payment->end_date->format('Y-m-d'),
+    //                 'days_left'   => $daysLeft,
+    //             ];
+    //         });
+
+    //     return response()->json([
+    //         'count' => $expiring->count(),
+    //         'memberships' => $expiring
+    //     ]);
+    // }
+
+    // ... your existing CRUD methods ...
+
+    /**
+     * Return all memberships expiring within 7 days as JSON
+     */
+    public function getExpiringMemberships()
+    {
+        $today = Carbon::today();
+        $nextWeek = Carbon::today()->addDays(7);
+
+        // Get latest payment per member within next 7 days
+        $expiring = Payment::with('member')
+            ->whereBetween('end_date', [$today, $nextWeek])
+            ->orderBy('end_date', 'asc')
+            ->get()
+            ->map(function ($payment) use ($today) {
+                return [
+                    'member_id'   => $payment->member->id,
+                    'member_name' => $payment->member->name,
+                    'email'       => $payment->member->email,
+                    'plan_type'   => ucfirst($payment->plan_type),
+                    'end_date'    => $payment->end_date->format('Y-m-d'),
+                    'days_left'   => $today->diffInDays(Carbon::parse($payment->end_date), false),
+                ];
+            });
+
+        return response()->json([
+            'count' => $expiring->count(),
+            'memberships' => $expiring
+        ]);
+    }
 }
+
+

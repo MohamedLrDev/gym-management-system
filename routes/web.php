@@ -34,6 +34,11 @@ Route::middleware('auth')->group(function () {
     Route::resource('members', MembersController::class);
     Route::resource('payments', PaymentsController::class);
 
+
+
+    Route::get('/members/expiring', [MembersController::class, 'getExpiringMemberships']);
+
+
     // About Us page
     Route::get('/about', fn() => Inertia::render('About'))->name('about');
 });
