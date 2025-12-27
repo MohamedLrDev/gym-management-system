@@ -1,106 +1,141 @@
-// resources/js/Pages/Payments/Edit.tsx
-import { Head, useForm } from "@inertiajs/react";
+import React from "react";
+import { Payment } from "./PaymentsTable";
+import { router } from "@inertiajs/react";
+import { ArrowLeft } from "lucide-react";
 
-interface Payment {
-    id: number;
-    member_id: number;
+type FormDataType = {
     plan_type: "monthly" | "yearly";
     amount: number;
     start_date: string;
-    end_date: string;
-}
+};
 
 interface Props {
     payment: Payment;
+    formData: FormDataType;
+    setFormData: React.Dispatch<React.SetStateAction<FormDataType>>;
+    onCancel: () => void;
 }
 
-export default function Edit({ payment }: Props) {
-    const { data, setData, put, processing, errors } = useForm({
-        member_id: payment.member_id,
-        plan_type: payment.plan_type,
-        amount: payment.amount,
-        start_date: payment.start_date,
-    });
-
-    const submit = (e: React.FormEvent) => {
+export default function Edit({
+    payment,
+    formData,
+    setFormData,
+    onCancel,
+}: Props) {
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(`/payments/${payment.id}`);
+        router.put(route("payments.update", payment.id), formData);
+        onCancel();
     };
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <Head title="Edit Payment" />
-            <div className="max-w-3xl mx-auto py-10 px-4">
-                <h1 className="text-2xl font-bold mb-6">Edit Payment</h1>
+        <div className="w-full md:w-96 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-lg overflow-hidden">
+            {/* Header Section */}
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+                <div className="flex items-center gap-3">
+                    <button
+                        onClick={onCancel}
+                        className="p-1.5 rounded-lg hover:bg-white/60 dark:hover:bg-gray-700/60 transition-colors duration-200"
+                        aria-label="Go back"
+                    >
+                        <ArrowLeft className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+                    </button>
+                    <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                        Edit Payment
+                    </h2>
+                </div>
+            </div>
 
-                <form onSubmit={submit} className="space-y-6 bg-white p-6 rounded-lg shadow">
-                    {/* Plan Type */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                            Plan Type
-                        </label>
-                        <select
-                            value={data.plan_type}
-                            onChange={(e) => setData("plan_type", e.target.value as "monthly" | "yearly")}
-                            className="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                        >
-                            <option value="monthly">Monthly</option>
-                            <option value="yearly">Yearly</option>
-                        </select>
-                        {errors.plan_type && (
-                            <p className="text-red-500 text-sm mt-1">{errors.plan_type}</p>
-                        )}
-                    </div>
+            {/* Form Section */}
+            <div className="px-6 py-5 space-y-5">
+                {/* Member Info - Read Only */}
+                <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 border border-gray-100 dark:border-gray-700">
+                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+                        Member
+                    </p>
+                    <p className="text-base font-semibold text-gray-900 dark:text-gray-100">
+                        {payment.member.name}
+                    </p>
+                </div>
 
-                    {/* Amount */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                            Amount (MAD)
-                        </label>
-                        <input
-                            type="number"
-                            value={data.amount}
-                            onChange={(e) => setData("amount", Number(e.target.value))}
-                            className="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                        />
-                        {errors.amount && (
-                            <p className="text-red-500 text-sm mt-1">{errors.amount}</p>
-                        )}
-                    </div>
+                {/* Plan Type Field */}
+                <div>
+                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-2">
+                        Plan Type
+                    </label>
+                    <select
+                        value={formData.plan_type}
+                        onChange={(e) =>
+                            setFormData({
+                                ...formData,
+                                plan_type: e.target.value as
+                                    | "monthly"
+                                    | "yearly",
+                            })
+                        }
+                        className="w-full px-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                    >
+                        <option value="monthly">Monthly</option>
+                        <option value="yearly">Yearly</option>
+                    </select>
+                </div>
 
-                    {/* Start Date */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                            Start Date
-                        </label>
-                        <input
-                            type="date"
-                            value={data.start_date}
-                            onChange={(e) => setData("start_date", e.target.value)}
-                            className="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                        />
-                        {errors.start_date && (
-                            <p className="text-red-500 text-sm mt-1">{errors.start_date}</p>
-                        )}
-                    </div>
+                {/* Amount Field */}
+                <div>
+                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-2">
+                        Amount (MAD)
+                    </label>
+                    <input
+                        type="number"
+                        value={formData.amount}
+                        onChange={(e) =>
+                            setFormData({
+                                ...formData,
+                                amount: Number(e.target.value),
+                            })
+                        }
+                        className="w-full px-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                        placeholder="Enter amount"
+                        min="0"
+                        step="0.01"
+                    />
+                </div>
 
-                    {/* Actions */}
-                    <div className="flex justify-end space-x-3">
-                        <a
-                            href="/payments"
-                            className="px-4 py-2 bg-gray-200 rounded-lg text-gray-700 hover:bg-gray-300 transition"
-                        >
-                            Cancel
-                        </a>
-                        <button
-                            type="submit"
-                            disabled={processing}
-                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-                        >
-                            {processing ? "Saving..." : "Save Changes"}
-                        </button>
-                    </div>
-                </form>
+                {/* Start Date Field */}
+                <div>
+                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-2">
+                        Start Date
+                    </label>
+                    <input
+                        type="date"
+                        value={formData.start_date}
+                        onChange={(e) =>
+                            setFormData({
+                                ...formData,
+                                start_date: e.target.value,
+                            })
+                        }
+                        className="w-full px-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                    />
+                </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="px-6 py-4 bg-gray-50 dark:bg-gray-800/30 border-t border-gray-200 dark:border-gray-700 flex justify-center gap-3">
+                <button
+                    type="button"
+                    onClick={onCancel}
+                    className="px-4 py-2 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium transition-colors duration-200 shadow-sm"
+                >
+                    Cancel
+                </button>
+                <button
+                    type="submit"
+                    onClick={handleSubmit}
+                    className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors duration-200 shadow-sm"
+                >
+                    Save Changes
+                </button>
             </div>
         </div>
     );
